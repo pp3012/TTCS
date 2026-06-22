@@ -32,9 +32,9 @@ export default function Register() {
           EduQuiz
         </div>
         <h1 className="auth-title">Tạo tài khoản</h1>
-        <p className="auth-subtitle">Đăng ký miễn phí và bắt đầu luyện tập ngay hôm nay.</p>
+        <p className="auth-subtitle">Đăng ký và bắt đầu luyện tập ngay.</p>
 
-        {error && <div className="auth-error">⚠️ {error}</div>}
+        {error && <div className="auth-error">️ {error}</div>}
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
@@ -58,7 +58,7 @@ export default function Register() {
             <input type="password" className="form-control" placeholder="Nhập lại mật khẩu" value={form.confirm} onChange={set('confirm')} required />
           </div>
           <button type="submit" className="btn btn-primary btn-full btn-lg" disabled={isLoading}>
-            {isLoading ? 'Đang xử lý...' : '✨ Đăng ký'}
+            {isLoading ? 'Đang xử lý...' : 'Đăng ký'}
           </button>
         </form>
 

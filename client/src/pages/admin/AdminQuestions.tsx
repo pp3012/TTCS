@@ -81,7 +81,7 @@ export default function AdminQuestions() {
       <div className="section-header">
         <h1 className="page-title">Quản lý câu hỏi</h1>
         <div style={{ display: 'flex', gap: 8 }}>
-          <button className="btn btn-secondary" onClick={() => setShowImport(true)}>📥 Nhập Excel</button>
+          <button className="btn btn-secondary" onClick={() => setShowImport(true)}>Nhập Excel</button>
           <button className="btn btn-primary" onClick={openCreate}>+ Thêm câu hỏi</button>
         </div>
       </div>
@@ -93,7 +93,7 @@ export default function AdminQuestions() {
         <span className="text-muted">{total} câu hỏi</span>
       </div>
 
-      {loading ? <div className="loading">⏳</div> : (
+      {loading ? <div className="loading"></div> : (
         <table className="admin-table">
           <thead><tr><th style={{width:40}}>ID</th><th>Nội dung</th><th>Chương</th><th>Độ khó</th><th>Loại</th><th>Đáp án</th><th>Thao tác</th></tr></thead>
           <tbody>
@@ -107,8 +107,8 @@ export default function AdminQuestions() {
                 <td style={{ fontWeight: 700, color: 'var(--success)' }}>{q.correct_option}</td>
                 <td>
                   <div style={{ display: 'flex', gap: 6 }}>
-                    <button className="btn btn-secondary" style={{ padding: '5px 10px', fontSize: 12 }} onClick={() => openEdit(q)}>✏️</button>
-                    <button className="btn btn-danger" style={{ padding: '5px 10px', fontSize: 12 }} onClick={() => handleDelete(q.question_id)}>🗑️</button>
+                    <button className="btn btn-secondary" style={{ padding: '5px 10px', fontSize: 12 }} onClick={() => openEdit(q)}>Sửa️</button>
+                    <button className="btn btn-danger" style={{ padding: '5px 10px', fontSize: 12 }} onClick={() => handleDelete(q.question_id)}>Xoá️</button>
                   </div>
                 </td>
               </tr>
@@ -175,7 +175,7 @@ export default function AdminQuestions() {
             </div>
             <div className="modal-actions">
               <button className="btn btn-secondary" onClick={() => setShowModal(false)}>Hủy</button>
-              <button className="btn btn-primary" onClick={save}>💾 {editId ? 'Cập nhật' : 'Tạo mới'}</button>
+              <button className="btn btn-primary" onClick={save}> {editId ? 'Cập nhật' : 'Tạo mới'}</button>
             </div>
           </div>
         </div>
@@ -185,7 +185,7 @@ export default function AdminQuestions() {
       {showImport && (
         <div className="modal-overlay" onClick={() => { setShowImport(false); setImportMsg(''); }}>
           <div className="modal" onClick={e => e.stopPropagation()}>
-            <h2 className="modal-title">📥 Nhập câu hỏi từ Excel</h2>
+            <h2 className="modal-title"> Nhập câu hỏi từ Excel</h2>
             <p className="text-muted" style={{ marginBottom: 16 }}>File Excel cần có các cột: content, option_a, option_b, option_c, option_d, correct_option, chapter_id, level_id, type_id, explanation</p>
             <div className="form-group">
               <label className="form-label">Môn học</label>
@@ -200,7 +200,7 @@ export default function AdminQuestions() {
             {importMsg && <div style={{ padding: 10, background: 'var(--gray-50)', borderRadius: 8, fontSize: 13, marginBottom: 12 }}>{importMsg}</div>}
             <div className="modal-actions">
               <button className="btn btn-secondary" onClick={() => { setShowImport(false); setImportMsg(''); }}>Đóng</button>
-              <button className="btn btn-primary" onClick={handleImport}>📤 Nhập</button>
+              <button className="btn btn-primary" onClick={handleImport}> Nhập</button>
             </div>
           </div>
         </div>

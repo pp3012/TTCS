@@ -54,8 +54,8 @@ export default function StatisticsPage() {
         </select>
       </div>
 
-      {loading ? <div className="loading">⏳ Đang tải...</div> : !stats ? (
-        <div className="empty"><div className="empty-icon">📊</div>Chưa có dữ liệu thống kê</div>
+      {loading ? <div className="loading"> Đang tải...</div> : !stats ? (
+        <div className="empty">Chưa có dữ liệu thống kê</div>
       ) : (
         <>
           <div className="overview-cards">
@@ -71,7 +71,7 @@ export default function StatisticsPage() {
 
           <div className="stats-grid">
             <div className="chart-card">
-              <div className="chart-title">📊 Tỷ lệ chính xác theo chương</div>
+              <div className="chart-title"> Tỷ lệ chính xác theo chương</div>
               {chapterData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={240}>
                   <BarChart data={chapterData}><XAxis dataKey="name" fontSize={11} /><YAxis domain={[0,100]} fontSize={11} /><Tooltip formatter={(v: number) => `${v}%`} /><Bar dataKey="accuracy" fill="#2563eb" radius={[4,4,0,0]} /></BarChart>
@@ -80,7 +80,7 @@ export default function StatisticsPage() {
             </div>
 
             <div className="chart-card">
-              <div className="chart-title">📈 Tiến bộ điểm số theo thời gian</div>
+              <div className="chart-title"> Tiến bộ điểm số theo thời gian</div>
               {scoreHistory.length > 0 ? (
                 <ResponsiveContainer width="100%" height={240}>
                   <LineChart data={scoreHistory}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="time" fontSize={11} /><YAxis domain={[0,10]} fontSize={11} /><Tooltip /><Legend /><Line type="monotone" dataKey="score" stroke="#2563eb" strokeWidth={2} name="Điểm" dot={{ r: 4 }} /></LineChart>
@@ -89,7 +89,7 @@ export default function StatisticsPage() {
             </div>
 
             <div className="chart-card">
-              <div className="chart-title">🎯 Tỷ lệ chính xác theo độ khó</div>
+              <div className="chart-title"> Tỷ lệ chính xác theo độ khó</div>
               {diffData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={200}>
                   <BarChart data={diffData} layout="vertical"><XAxis type="number" domain={[0,100]} fontSize={11} /><YAxis type="category" dataKey="name" fontSize={12} width={80} /><Tooltip formatter={(v: number) => `${v}%`} /><Bar dataKey="accuracy" fill="#7c3aed" radius={[0,4,4,0]} /></BarChart>
@@ -98,7 +98,7 @@ export default function StatisticsPage() {
             </div>
 
             <div className="chart-card">
-              <div className="chart-title">📝 Tỷ lệ chính xác theo loại câu hỏi</div>
+              <div className="chart-title"> Tỷ lệ chính xác theo loại câu hỏi</div>
               {typeData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={200}>
                   <BarChart data={typeData} layout="vertical"><XAxis type="number" domain={[0,100]} fontSize={11} /><YAxis type="category" dataKey="name" fontSize={12} width={80} /><Tooltip formatter={(v: number) => `${v}%`} /><Bar dataKey="accuracy" fill="#16a34a" radius={[0,4,4,0]} /></BarChart>

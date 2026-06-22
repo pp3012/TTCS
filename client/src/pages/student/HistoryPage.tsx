@@ -55,9 +55,9 @@ export default function HistoryPage() {
       </div>
 
       {loading ? (
-        <div className="loading">⏳ Đang tải...</div>
+        <div className="loading"> Đang tải...</div>
       ) : sessions.length === 0 ? (
-        <div className="empty"><div className="empty-icon">📋</div>Chưa có lịch sử luyện tập</div>
+        <div className="empty">Chưa có lịch sử luyện tập</div>
       ) : (
         <>
           <table className="history-table">

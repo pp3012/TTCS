@@ -102,7 +102,7 @@ export default function QuizPage() {
     return () => clearInterval(timer);
   }, [loading, submit, timeLeft]);
 
-  if (loading) return <div className="loading">⏳ Đang tải bài luyện tập...</div>;
+  if (loading) return <div className="loading"> Đang tải bài luyện tập...</div>;
 
   const q = questions[current];
   const mins = String(Math.floor(timeLeft / 60)).padStart(2, '0');
@@ -121,11 +121,11 @@ export default function QuizPage() {
             <div>
               <div style={{fontWeight: 700, fontSize: 15}}>{subjectName}</div>
               <div className="quiz-info">
-                {mode === 'personalized' ? '🎯 Luyện tập cá nhân hóa' : '⚡ Luyện tập tự do'}
+                {mode === 'personalized' ? ' Luyện tập cá nhân hóa' : ' Luyện tập tự do'}
               </div>
             </div>
             <div className={`timer ${timeLeft < 300 ? 'warning' : ''}`}>
-              ⏱ {mins}:{secs}
+               {mins}:{secs}
             </div>
           </div>
 
@@ -170,7 +170,7 @@ export default function QuizPage() {
                 }}
                 disabled={submitting}
             >
-              {submitting ? '⏳ Đang nộp...' : '📤 Nộp bài'}
+              {submitting ? ' Đang nộp...' : ' Nộp bài'}
             </button>
             <button
                 className="btn btn-secondary"

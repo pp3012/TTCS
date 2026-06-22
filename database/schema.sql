@@ -158,13 +158,11 @@ INSERT INTO Chapters (subject_id, chapter_name, order_index) VALUES
 (6, 'Thiết kế CSDL', 3),
 (6, 'Tối ưu hóa truy vấn', 4);
 
--- Admin user (password: admin123)
+-- User
 INSERT INTO Users (user_name, email, password_hash, full_name, role) VALUES
-('admin', 'admin@eduquiz.vn', '$2b$10$rQZ9uAVBB2Ety3m.6PsVdOA8DzBnK5rUn9HlgFNgJn0fajGHMO/1i', 'Quản trị viên', 'admin');
-
--- Sample student (password: student123)
-INSERT INTO Users (user_name, email, password_hash, full_name, role) VALUES
-('sinhvien01', 'sinhvien01@example.com', '$2b$10$xTZH5OPbUv0K1j4AswQgW.CmqF7YJqUgJvXPmULs29F5EEPlStqlu', 'Nguyễn Văn An', 'student');
+('admin', 'admin@gmail.com', '$2a$12$ExR8M3sRmdkO8N2S5K9vbe9Q/V.U968Ie1W6gbeW16nS6e1b6qNde', 'admin', 'admin'),
+('st01', 'st01@gmail.com', '$2a$12$kYgqR2dGfZpM2f9Jv3K8buX7yO1gVe9Ie2W7gbeW17nS7e1b7qNde', 'st01', 'student');
+-- usname: st01/admin;  pass 123456
 
 -- Sample questions for Triết học (subject_id=1)
 INSERT INTO Questions (subject_id, chapter_id, level_id, type_id, content, option_a, option_b, option_c, option_d, correct_option, explanation) VALUES

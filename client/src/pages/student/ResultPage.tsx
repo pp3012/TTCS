@@ -41,40 +41,45 @@ export default function ResultPage() {
             <span className="score-denom">/10</span>
           </div>
         </div>
-        
-        <div className="stat-grid">
-          <div className="stat-box">
-            <p className="stat-label">Môn học</p>
-            <p className="stat-val" style={{ fontSize: 14 }}>{result.subject_name}</p>
+
+        <div className="stat-container" style={{ display: 'flex', flexDirection: 'column', gap: '12px' ,alignItems: 'center'}}>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <div className="stat-box">
+              <p className="stat-label">Môn học</p>
+              <p className="stat-val" style={{ fontSize: 14 }}>{result.subject_name}</p>
+            </div>
+            <div className="stat-box">
+              <p className="stat-label">Thời gian làm bài</p>
+              <p className="stat-val">{durMins}:00</p>
+            </div>
           </div>
-          <div className="stat-box">
-            <p className="stat-label success">✔ Đúng</p>
-            <p className="stat-val success">{correctCount}</p>
-          </div>
-          <div className="stat-box">
-            <p className="stat-label danger">✖ Sai</p>
-            <p className="stat-val danger">{wrongCount}</p>
-          </div>
-          <div className="stat-box">
-            <p className="stat-label">Thời gian</p>
-            <p className="stat-val">{durMins}:00</p>
+
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <div className="stat-box">
+              <p className="stat-label success">✔ Đúng</p>
+              <p className="stat-val success">{correctCount}/{totalQuestions}</p>
+            </div>
+            <div className="stat-box">
+              <p className="stat-label danger">✖ Sai</p>
+              <p className="stat-val danger">{wrongCount}/{totalQuestions}</p>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Action Buttons */}
       <div className="action-buttons">
+        <button
+            onClick={() => navigate('/history')}
+            className="btn btn-primary" style={{ padding: '12px 24px' }}
+        >
+          Quay về
+        </button>
         <button 
           onClick={() => navigate(`/practice/${result.subject_id}`)}
           className="btn btn-outline-gray" style={{ padding: '12px 24px' }}
         >
-          🔄 Làm lại bài này
-        </button>
-        <button 
-          onClick={() => navigate('/')}
-          className="btn btn-primary" style={{ padding: '12px 24px' }}
-        >
-          ▤ Quay về Dashboard
+           Tiếp tục luyện tập môn này
         </button>
       </div>
 

@@ -84,6 +84,7 @@ export const practiceApi = {
 export const adminApi = {
   getUsers: (params?: object) => api.get('/admin/users', { params }),
   getUserById: (id: number) => api.get(`/admin/users/${id}`),
+  createUser: (data: object) => api.post('/admin/users', data),
   updateUser: (id: number, data: object) => api.put(`/admin/users/${id}`, data),
   deleteUser: (id: number) => api.delete(`/admin/users/${id}`),
   getSubjectStats: () => api.get('/admin/stats/subjects'),

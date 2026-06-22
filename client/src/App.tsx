@@ -13,12 +13,14 @@ import AdminLayout from './pages/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminQuestions from './pages/admin/AdminQuestions';
-//import AdminSubjects from './pages/admin/AdminSubjects';
-//import AdminStatistics from './pages/admin/AdminStatistics';
+import AdminSubjects from './pages/admin/AdminSubjects';
+import AdminStatistics from './pages/admin/AdminStatistics';
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user } = useAuth();
-  return user ? <>{children}</> : <Navigate to="/login" replace />;
+  const { user, isAdmin } = useAuth();
+  if (!user) return <Navigate to="/login" replace />;
+  if (isAdmin) return <Navigate to="/admin" replace />;
+  return <>{children}</>;
 };
 
 const AdminRoute = ({ children }: { children: React.ReactNode }) => {
@@ -29,8 +31,11 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user } = useAuth();
-  return user ? <Navigate to="/" replace /> : <>{children}</>;
+  const { user, isAdmin } = useAuth();
+  if (user) {
+    return isAdmin ? <Navigate to="/admin" replace /> : <Navigate to="/" replace />;
+  }
+  return <>{children}</>;
 };
 
 function AppRoutes() {
@@ -51,10 +56,10 @@ function AppRoutes() {
 
       <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
         <Route index element={<AdminDashboard />} />
-
-        <Route path="users" element={<AdminUsers />} />
+        <Route path="subjects" element={<AdminSubjects />} />
         <Route path="questions" element={<AdminQuestions />} />
-
+        <Route path="users" element={<AdminUsers />} />
+        <Route path="statistics" element={<AdminStatistics />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

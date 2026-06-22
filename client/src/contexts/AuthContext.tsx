@@ -6,7 +6,7 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   isLoading: boolean;
-  login: (identifier: string, password: string) => Promise<void>;
+  login: (identifier: string, password: string) => Promise<User | undefined>;
   register: (data: { user_name: string; email: string; password: string; full_name?: string }) => Promise<void>;
   logout: () => void;
   isAdmin: boolean;
@@ -31,6 +31,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setToken(token);
       localStorage.setItem('user', JSON.stringify(user));
       localStorage.setItem('token', token);
+      return user;
     } finally {
       setIsLoading(false);
     }

@@ -33,7 +33,7 @@ export default function PracticeSettings() {
       }));
       navigate(`/quiz/${session_id}`);
     } catch (err: unknown) {
-      alert((err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Lỗi tạo bài luyện tập');
+      alert((err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Lỗi tạo phiên luyện tập');
     } finally { setLoading(false); }
   };
 
@@ -47,7 +47,7 @@ export default function PracticeSettings() {
       }));
       navigate(`/quiz/${session_id}`);
     } catch (err: unknown) {
-      alert((err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Lỗi tạo bài luyện tập');
+      alert((err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Lỗi tạo phiên luyện tập');
     } finally { setLoading(false); }
   };
 
@@ -57,10 +57,9 @@ export default function PracticeSettings() {
 
       <div className="card" style={{ padding: 28 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 24 }}>
-          <div style={{ fontSize: 32 }}>📖</div>
           <div>
             <div style={{ fontSize: 18, fontWeight: 700 }}>Cài đặt luyện tập</div>
-            <div className="text-muted">Môn: {subject?.subject_name} · {subject?.question_count || 0} câu có sẵn</div>
+            <div className="text-muted">Môn: {subject?.subject_name}</div>
           </div>
         </div>
 
@@ -69,17 +68,15 @@ export default function PracticeSettings() {
           <div className="setting-label">Chế độ luyện tập</div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <div className={`mode-card${mode === 'free' ? ' selected' : ''}`} style={{ border: mode === 'free' ? '2px solid var(--primary)' : undefined }} onClick={() => setMode('free')}>
-              <div className="mode-icon" style={{ background: '#dbeafe', fontSize: 20 }}>⚡</div>
               <div>
                 <div className="mode-title" style={{ fontSize: 13 }}>Tự do</div>
                 <div className="mode-desc">Tuỳ chỉnh số câu & thời gian</div>
               </div>
             </div>
             <div className={`mode-card${mode === 'personalized' ? ' selected' : ''}`} style={{ border: mode === 'personalized' ? '2px solid var(--secondary)' : undefined }} onClick={() => setMode('personalized')}>
-              <div className="mode-icon" style={{ background: '#ede9fe', fontSize: 20 }}>🎯</div>
               <div>
                 <div className="mode-title" style={{ fontSize: 13 }}>Cá nhân hóa</div>
-                <div className="mode-desc">50 câu / 60 phút tối ưu</div>
+                <div className="mode-desc">50 câu / 60 phút</div>
               </div>
             </div>
           </div>
@@ -138,11 +135,11 @@ export default function PracticeSettings() {
               </div>
               <div className="summary-item">
                 <div className="summary-key">Tổng thời gian</div>
-                <div className="summary-val">⏱ {String(totalMins).padStart(2, '0')}:00</div>
+                <div className="summary-val"> {String(totalMins).padStart(2, '0')}:00</div>
               </div>
             </div>
             <button className="btn btn-primary btn-full btn-lg" onClick={startFree} disabled={loading}>
-              {loading ? '⏳ Đang tạo...' : '▶ Bắt đầu luyện tập'}
+              {loading ? ' Đang tạo...' : ' Bắt đầu luyện tập'}
             </button>
           </>
         )}
@@ -150,7 +147,7 @@ export default function PracticeSettings() {
         {mode === 'personalized' && (
           <>
             <div style={{ background: 'var(--primary-light)', border: '1px solid #bfdbfe', borderRadius: 'var(--radius)', padding: 16, marginBottom: 20, fontSize: 13, color: 'var(--gray-700)' }}>
-              🤖 Hệ thống sẽ tự động phân tích lịch sử học tập của bạn và tạo đề thi cá nhân hóa gồm <strong>50 câu / 60 phút</strong> phù hợp với năng lực của bạn.
+               Hệ thống sẽ tự động phân tích lịch sử học tập của bạn và tạo đề thi cá nhân hóa gồm <strong>50 câu / 60 phút</strong> phù hợp với năng lực của bạn.
             </div>
             <div className="summary-box" style={{ marginBottom: 24 }}>
               <div className="summary-item">
@@ -163,7 +160,7 @@ export default function PracticeSettings() {
               </div>
             </div>
             <button className="btn btn-full btn-lg" style={{ background: 'var(--secondary)', color: '#fff' }} onClick={startPersonalized} disabled={loading}>
-              {loading ? '⏳ Đang tạo...' : '🎯 Bắt đầu luyện tập cá nhân hóa'}
+              {loading ? ' Đang tạo...' : ' Bắt đầu luyện tập cá nhân hóa'}
             </button>
           </>
         )}

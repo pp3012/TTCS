@@ -5,7 +5,6 @@ import { subjectApi } from '../../services/api';
 import { Subject } from '../../types';
 
 const SUBJECT_COLORS = ['#dbeafe','#dcfce7','#fce7f3','#ffedd5','#ede9fe','#cffafe'];
-const SUBJECT_ICONS = ['📚','⚡','🖥️','🌐','🔐','🗄️'];
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -29,7 +28,7 @@ export default function Dashboard() {
       </div>
 
       {loading ? (
-        <div className="loading">⏳ Đang tải...</div>
+        <div className="loading"> Đang tải...</div>
       ) : (
         <div className="subject-grid">
           {subjects.map((s, i) => (
@@ -38,19 +37,14 @@ export default function Dashboard() {
               className="subject-card card-hover"
               onClick={() => navigate(`/practice/${s.subject_id}`)}
             >
-              <div className="subject-icon" style={{ background: SUBJECT_COLORS[i % SUBJECT_COLORS.length] }}>
-                {SUBJECT_ICONS[i % SUBJECT_ICONS.length]}
-              </div>
+
               <div className="subject-name">{s.subject_name}</div>
               {s.description && <div className="subject-desc">{s.description}</div>}
-              <div className="subject-meta">
-                📝 {(s as Subject & { question_count?: number }).question_count || 0} câu hỏi
-              </div>
             </div>
           ))}
         </div>
       )}
-
+        {/*
       <div className="divider" />
       <div className="section-header">
         <span className="section-title">Chế độ luyện tập</span>
@@ -58,7 +52,6 @@ export default function Dashboard() {
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
         <div className="mode-card" style={{ opacity: 0.6, cursor: 'default' }}>
-          <div className="mode-icon" style={{ background: '#dbeafe' }}>⚡</div>
           <div>
             <div className="mode-title">Luyện tập tự do</div>
             <div className="mode-desc">Tự chọn số câu và thời gian theo ý muốn</div>
@@ -66,7 +59,6 @@ export default function Dashboard() {
           <span className="mode-arrow">›</span>
         </div>
         <div className="mode-card" style={{ opacity: 0.6, cursor: 'default' }}>
-          <div className="mode-icon" style={{ background: '#ede9fe' }}>🎯</div>
           <div>
             <div className="mode-title">Luyện tập cá nhân hóa</div>
             <div className="mode-desc">Tự động sinh 50 câu, 60 phút — tối ưu cho bạn</div>
@@ -74,6 +66,7 @@ export default function Dashboard() {
           <span className="mode-arrow">›</span>
         </div>
       </div>
+      */}
     </div>
   );
 }

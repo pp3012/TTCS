@@ -119,6 +119,32 @@ export class PracticeSessionDAO {
     );
     return rows as { submit_time: Date; score: number }[];
   }
+
+  /// Bảng xếp hạng sinh viên (top N theo số lượt luyện tập)
+  async getLeaderboard(subject_id?: number, limit: number = 20): Promise<{
+    user_id: number; user_name: string; full_name: string;
+    total_sessions: number; avg_score: number; best_score: number;
+  }[]> {
+    const params: unknown[] = [];
+    let where = 'WHERE ps.score IS NOT NULL';
+    if (subject_id) { where += ' AND ps.subject_id = ?'; params.push(subject_id); }
+    params.push(limit);
+
+    const [rows] = await pool.query<RowDataPacket[]>(
+      `SELECT u.user_id, u.user_name, u.full_name,
+              COUNT(ps.session_id) AS total_sessions,
+              AVG(ps.score) AS avg_score,
+              MAX(ps.score) AS best_score
+       FROM Practice_sessions ps
+       JOIN Users u ON ps.user_id = u.user_id
+       ${where}
+       GROUP BY u.user_id, u.user_name, u.full_name
+       ORDER BY total_sessions DESC, avg_score DESC
+       LIMIT ?`,
+      params
+    );
+    return rows as { user_id: number; user_name: string; full_name: string; total_sessions: number; avg_score: number; best_score: number }[];
+  }
 }
 
 export const practiceSessionDAO = new PracticeSessionDAO();

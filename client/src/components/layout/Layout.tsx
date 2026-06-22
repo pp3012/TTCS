@@ -14,10 +14,10 @@ export default function Layout() {
           EduQuiz
         </Link>
         <div className="navbar-nav">
-          <Link to="/" className={isActive('/')}>🏠 Trang chủ</Link>
-          <Link to="/history" className={isActive('/history')}>📋 Lịch sử</Link>
-          <Link to="/statistics" className={isActive('/statistics')}>📊 Thống kê</Link>
-          {isAdmin && <Link to="/admin" className="navbar-link" style={{ color: '#7c3aed' }}>⚙️ Quản trị</Link>}
+          <Link to="/" className={isActive('/')}> Trang chủ</Link>
+          <Link to="/history" className={isActive('/history')}> Lịch sử</Link>
+          <Link to="/statistics" className={isActive('/statistics')}> Thống kê</Link>
+          {isAdmin && <Link to="/admin" className="navbar-link" style={{ color: '#7c3aed' }}>️ Quản trị</Link>}
         </div>
         <div className="navbar-right">
           <div className="user-pill">

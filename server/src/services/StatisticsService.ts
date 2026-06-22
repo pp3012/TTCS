@@ -26,6 +26,10 @@ export class StatisticsService {
     }
     return results;
   }
+
+  async getLeaderboard(subject_id?: number, limit: number = 20): Promise<object[]> {
+    return practiceSessionDAO.getLeaderboard(subject_id, limit);
+  }
 }
 
 export const statisticsService = new StatisticsService();

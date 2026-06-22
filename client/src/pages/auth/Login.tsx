@@ -13,8 +13,13 @@ export default function Login() {
     e.preventDefault();
     setError('');
     try {
-      await login(identifier, password);
-      navigate('/');
+      //Gọi hàm login từ AuthContext và đợi kết quả
+      const user = await login(identifier, password);
+      if (user?.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
       setError(msg || 'Đăng nhập thất bại');
@@ -31,7 +36,7 @@ export default function Login() {
         <h1 className="auth-title">Đăng nhập</h1>
         <p className="auth-subtitle">Chào mừng trở lại! Vui lòng đăng nhập để tiếp tục.</p>
 
-        {error && <div className="auth-error">⚠️ {error}</div>}
+        {error && <div className="auth-error">️ {error}</div>}
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
@@ -55,8 +60,9 @@ export default function Login() {
               required
             />
           </div>
+          {/*disabled={isLoading}: Khi đang gọi API (isLoading === true), nút này sẽ bị (khóa lại) để ngăn user bấm liên tục nhiều lần.*/}
           <button type="submit" className="btn btn-primary btn-full btn-lg" disabled={isLoading}>
-            {isLoading ? 'Đang đăng nhập...' : '🔐 Đăng nhập'}
+            {isLoading ? 'Đang đăng nhập...' : ' Đăng nhập'}
           </button>
         </form>
 
