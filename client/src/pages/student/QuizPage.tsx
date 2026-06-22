@@ -2,11 +2,13 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { practiceApi } from '../../services/api';
 import { Question } from '../../types';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function QuizPage() {
   // Lấy sessionId từ URL
   const {sessionId} = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<Record<number, string | null>>({});
@@ -124,8 +126,14 @@ export default function QuizPage() {
                 {mode === 'personalized' ? ' Luyện tập cá nhân hóa' : ' Luyện tập tự do'}
               </div>
             </div>
-            <div className={`timer ${timeLeft < 300 ? 'warning' : ''}`}>
-               {mins}:{secs}
+            <div className="quiz-header-actions">
+              <div className="quiz-user-pill">
+                <div className="user-avatar">{user?.user_name?.[0]?.toUpperCase()}</div>
+                <span className="user-name">{user?.user_name}</span>
+              </div>
+              <div className={`timer ${timeLeft < 300 ? 'warning' : ''}`}>
+                 {mins}:{secs}
+              </div>
             </div>
           </div>
 

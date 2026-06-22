@@ -25,18 +25,12 @@ export default function AdminUsers() {
 
   const load = () => {
     setLoading(true);
-    adminApi.getUsers({ page, limit: LIMIT, search: search || undefined })
+    adminApi.getUsers({ page, limit: LIMIT, search: search.trim() || undefined })
       .then(r => { setUsers(r.data.data || []); setTotal(r.data.total || 0); })
       .finally(() => setLoading(false));
   };
 
-  useEffect(load, [page]);
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    setPage(1);
-    load();
-  };
+  useEffect(load, [page, search]);
 
   const handleDelete = async (u: User) => {
     if (!confirm(`Bạn có chắc muốn xóa tài khoản "${u.user_name}"?`)) return;
@@ -99,17 +93,14 @@ export default function AdminUsers() {
         </button>
       </div>
 
-      {/* Search bar */}
-      <form className="filter-bar" onSubmit={handleSearch} style={{ marginBottom: 20 }}>
+      <div className="filter-bar" style={{ marginBottom: 20 }}>
         <input
           className="search-input"
           placeholder="Tìm theo tên đăng nhập hoặc email..."
           value={search}
-          onChange={e => setSearch(e.target.value)}
+          onChange={e => { setSearch(e.target.value); setPage(1); }}
         />
-        <button type="submit" className="btn btn-secondary">🔍 Tìm kiếm</button>
-        {search && <button type="button" className="btn btn-secondary" onClick={() => { setSearch(''); setPage(1); setTimeout(load, 50); }}>✕ Xoá</button>}
-      </form>
+      </div>
 
       {loading ? <div className="loading"> Đang tải...</div> : (
         <>

@@ -11,6 +11,7 @@ export default function AdminQuestions() {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [subjectFilter, setSubjectFilter] = useState(0);
+  const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState(EMPTY_Q);
@@ -27,15 +28,18 @@ export default function AdminQuestions() {
     if (!subjectFilter) return;
     setLoading(true);
     Promise.all([
-      questionApi.getBySubject(subjectFilter, { page, limit: LIMIT }),
+      questionApi.getBySubject(subjectFilter, { page, limit: LIMIT, search: searchTerm.trim() || undefined }),
       subjectApi.getById(subjectFilter),
     ]).then(([qr, sr]) => {
       setQuestions(qr.data.data || []); setTotal(qr.data.total || 0);
       setChapters(sr.data.data?.chapters || []);
     }).finally(() => setLoading(false));
-  }, [subjectFilter, page]);
+  }, [subjectFilter, page, searchTerm]);
 
-  const load = () => { questionApi.getBySubject(subjectFilter, { page, limit: LIMIT }).then(r => { setQuestions(r.data.data || []); setTotal(r.data.total || 0); }); };
+  const load = () => {
+    questionApi.getBySubject(subjectFilter, { page, limit: LIMIT, search: searchTerm.trim() || undefined })
+      .then(r => { setQuestions(r.data.data || []); setTotal(r.data.total || 0); });
+  };
 
   const openCreate = () => { setEditId(null); setForm({ ...EMPTY_Q, subject_id: subjectFilter }); setShowModal(true); };
   const openEdit = (q: Question) => {
@@ -90,10 +94,18 @@ export default function AdminQuestions() {
         <select className="filter-select" value={subjectFilter} onChange={e => { setSubjectFilter(Number(e.target.value)); setPage(1); }}>
           {subjects.map(s => <option key={s.subject_id} value={s.subject_id}>{s.subject_name}</option>)}
         </select>
+        <input
+          className="search-input"
+          value={searchTerm}
+          onChange={e => { setSearchTerm(e.target.value); setPage(1); }}
+          placeholder="Tìm theo nội dung, chương, độ khó hoặc loại..."
+        />
         <span className="text-muted">{total} câu hỏi</span>
       </div>
 
-      {loading ? <div className="loading"></div> : (
+      {loading ? <div className="loading"></div> : questions.length === 0 ? (
+        <div className="empty-state">Không tìm thấy câu hỏi phù hợp.</div>
+      ) : (
         <table className="admin-table">
           <thead><tr><th style={{width:40}}>ID</th><th>Nội dung</th><th>Chương</th><th>Độ khó</th><th>Loại</th><th>Đáp án</th><th>Thao tác</th></tr></thead>
           <tbody>

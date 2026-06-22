@@ -73,6 +73,26 @@ export class SubjectController {
     }
   }
 
+  async addChapter(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const subject_id = Number(req.params.id);
+      const subject = await subjectDAO.findById(subject_id);
+      if (!subject) { res.status(404).json({ success: false, message: 'Môn học không tồn tại' }); return; }
+
+      const chapters = await chapterDAO.getChaptersBySubject(subject_id);
+      const orderIndex = chapters.length + 1;
+      const chapterName = String(req.body.chapter_name || '').trim() || `Chương ${orderIndex}`;
+      await chapterDAO.createChapter({ subject_id, chapter_name: chapterName, order_index: orderIndex });
+      await subjectDAO.update(subject_id, { total_chapter: orderIndex });
+
+      const updated = await subjectDAO.findById(subject_id);
+      const updatedChapters = await chapterDAO.getChaptersBySubject(subject_id);
+      res.status(201).json({ success: true, data: { ...updated, chapters: updatedChapters } });
+    } catch (err: unknown) {
+      res.status(500).json({ success: false, message: (err as Error).message });
+    }
+  }
+
   async delete(req: AuthRequest, res: Response): Promise<void> {
     try {
       await subjectDAO.delete(Number(req.params.id));

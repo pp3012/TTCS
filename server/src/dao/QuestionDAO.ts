@@ -22,17 +22,32 @@ export class QuestionDAO {
 
   async findBySubject(subject_id: number, filters?: {
     chapter_id?: number; level_id?: number; type_id?: number;
+    search?: string;
     page?: number; limit?: number;
   }): Promise<{ questions: QuestionRow[]; total: number }> {
-    let sql = `${this.selectJoin} WHERE q.subject_id = ?`;
+    const conditions = ['q.subject_id = ?'];
     const params: unknown[] = [subject_id];
 
-    if (filters?.chapter_id) { sql += ' AND q.chapter_id = ?'; params.push(filters.chapter_id); }
-    if (filters?.level_id) { sql += ' AND q.level_id = ?'; params.push(filters.level_id); }
-    if (filters?.type_id) { sql += ' AND q.type_id = ?'; params.push(filters.type_id); }
+    if (filters?.chapter_id) { conditions.push('q.chapter_id = ?'); params.push(filters.chapter_id); }
+    if (filters?.level_id) { conditions.push('q.level_id = ?'); params.push(filters.level_id); }
+    if (filters?.type_id) { conditions.push('q.type_id = ?'); params.push(filters.type_id); }
+    if (filters?.search?.trim()) {
+      const like = `%${filters.search.trim()}%`;
+      conditions.push('(q.content LIKE ? OR c.chapter_name LIKE ? OR dl.level_name LIKE ? OR qt.type_name LIKE ?)');
+      params.push(like, like, like, like);
+    }
 
-    const countSql = `SELECT COUNT(*) as total FROM Questions q WHERE q.subject_id = ?${filters?.chapter_id ? ' AND q.chapter_id = ?' : ''}${filters?.level_id ? ' AND q.level_id = ?' : ''}${filters?.type_id ? ' AND q.type_id = ?' : ''}`;
-    const countParams = [subject_id, ...(filters?.chapter_id ? [filters.chapter_id] : []), ...(filters?.level_id ? [filters.level_id] : []), ...(filters?.type_id ? [filters.type_id] : [])];
+    const whereSql = ` WHERE ${conditions.join(' AND ')}`;
+    let sql = `${this.selectJoin}${whereSql}`;
+    const countSql = `
+      SELECT COUNT(*) as total
+      FROM Questions q
+      LEFT JOIN Chapters c ON q.chapter_id = c.chapter_id
+      LEFT JOIN Difficulty_levels dl ON q.level_id = dl.level_id
+      LEFT JOIN Question_type qt ON q.type_id = qt.type_id
+      ${whereSql}
+    `;
+    const countParams = [...params];
     const [countRows] = await pool.query<RowDataPacket[]>(countSql, countParams);
     const total = (countRows[0] as { total: number }).total;
 

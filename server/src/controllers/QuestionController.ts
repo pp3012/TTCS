@@ -10,11 +10,12 @@ export class QuestionController {
   async getBySubject(req: Request, res: Response): Promise<void> {
     try {
       const subject_id = Number(req.params.subjectId);
-      const { chapter_id, level_id, type_id, page, limit } = req.query;
+      const { chapter_id, level_id, type_id, page, limit, search } = req.query;
       const result = await questionDAO.findBySubject(subject_id, {
         chapter_id: chapter_id ? Number(chapter_id) : undefined,
         level_id: level_id ? Number(level_id) : undefined,
         type_id: type_id ? Number(type_id) : undefined,
+        search: typeof search === 'string' ? search : undefined,
         page: page ? Number(page) : 1,
         limit: limit ? Number(limit) : 20,
       });

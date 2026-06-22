@@ -1,20 +1,32 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { subjectApi } from '../../services/api';
 import { Subject } from '../../types';
 
-const SUBJECT_COLORS = ['#dbeafe','#dcfce7','#fce7f3','#ffedd5','#ede9fe','#cffafe'];
+const SUBJECT_COLORS = ['#e0f2fb'];
 
 export default function Dashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     subjectApi.getAll().then(r => setSubjects(r.data.data || [])).finally(() => setLoading(false));
   }, []);
+
+  const filteredSubjects = useMemo(() => {
+    const keyword = searchTerm.trim().toLowerCase();
+    if (!keyword) return subjects;
+
+    return subjects.filter(subject => {
+      const name = subject.subject_name.toLowerCase();
+      const description = subject.description?.toLowerCase() || '';
+      return name.includes(keyword) || description.includes(keyword);
+    });
+  }, [subjects, searchTerm]);
 
   return (
     <div className="container">
@@ -27,14 +39,26 @@ export default function Dashboard() {
         <span className="section-title">Chọn môn học</span>
       </div>
 
+      <div className="subject-search">
+        <input
+          className="form-control"
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+          placeholder="Tìm kiếm môn học..."
+        />
+      </div>
+
       {loading ? (
         <div className="loading"> Đang tải...</div>
+      ) : filteredSubjects.length === 0 ? (
+        <div className="empty-state">Không tìm thấy môn học phù hợp.</div>
       ) : (
         <div className="subject-grid">
-          {subjects.map((s, i) => (
+          {filteredSubjects.map((s, i) => (
             <div
               key={s.subject_id}
               className="subject-card card-hover"
+              style={{ background: SUBJECT_COLORS[0] }}
               onClick={() => navigate(`/practice/${s.subject_id}`)}
             >
 
@@ -44,29 +68,6 @@ export default function Dashboard() {
           ))}
         </div>
       )}
-        {/*
-      <div className="divider" />
-      <div className="section-header">
-        <span className="section-title">Chế độ luyện tập</span>
-        <span className="text-muted">Vui lòng chọn môn học trước để bắt đầu.</span>
-      </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-        <div className="mode-card" style={{ opacity: 0.6, cursor: 'default' }}>
-          <div>
-            <div className="mode-title">Luyện tập tự do</div>
-            <div className="mode-desc">Tự chọn số câu và thời gian theo ý muốn</div>
-          </div>
-          <span className="mode-arrow">›</span>
-        </div>
-        <div className="mode-card" style={{ opacity: 0.6, cursor: 'default' }}>
-          <div>
-            <div className="mode-title">Luyện tập cá nhân hóa</div>
-            <div className="mode-desc">Tự động sinh 50 câu, 60 phút — tối ưu cho bạn</div>
-          </div>
-          <span className="mode-arrow">›</span>
-        </div>
-      </div>
-      */}
     </div>
   );
 }
