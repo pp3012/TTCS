@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { questionDAO } from '../dao/QuestionDAO';
+import { subjectDAO } from '../dao/SubjectDAO';
 import { QuestionModel} from '../models/Question';
 import { validateCreateQuestion } from '../dto/QuestionDTO';
 import * as XLSX from 'xlsx';
@@ -68,7 +69,13 @@ export class QuestionController {
 
   async delete(req: AuthRequest, res: Response): Promise<void> {
     try {
-      await questionDAO.delete(Number(req.params.id));
+      const question_id = Number(req.params.id);
+      const hasHistory = await questionDAO.hasPracticeHistory(question_id);
+      if (hasHistory) {
+        res.status(400).json({ success: false, message: 'Không thể xóa câu hỏi này vì đã có lịch sử luyện tập' });
+        return;
+      }
+      await questionDAO.delete(question_id);
       res.json({ success: true, message: 'Đã xóa câu hỏi' });
     } catch (err: unknown) {
       res.status(500).json({ success: false, message: (err as Error).message });
@@ -81,6 +88,12 @@ export class QuestionController {
       const subject_id = Number(req.body.subject_id);
       if (!subject_id) { res.status(400).json({ success: false, message: 'Thiếu subject_id' }); return; }
 
+      // Load danh sách chương của môn được chọn — dùng để map số thứ tự (order_index) trong Excel → chapter_id đúng
+      const subjectChapters = await subjectDAO.findChaptersBySubject(subject_id);
+      // Map: order_index -> chapter_id (ví dụ: 1 -> 5, 2 -> 6 nếu môn 2 có chapter_id 5,6)
+      const chapterByOrder = new Map<number, number>();
+      subjectChapters.forEach(c => chapterByOrder.set(c.order_index, c.chapter_id));
+
       const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
       const rows = XLSX.utils.sheet_to_json<Record<string, string>>(sheet);
@@ -90,19 +103,89 @@ export class QuestionController {
 
       for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
+        
+        // Chuyển toàn bộ tên cột thành chữ thường để so sánh cho an toàn
+        const lowerRow: Record<string, string> = {};
+        for (const key in row) {
+          lowerRow[key.toLowerCase().trim()] = String(row[key]);
+        }
+
+        const findKey = (keywords: string[]) => Object.keys(lowerRow).find(k => keywords.some(kw => k.includes(kw)));
+
+        const chapterKey = findKey(['chapter_id', 'chương']);
+        const levelKey = findKey(['level_id', 'độ khó', 'mức độ']);
+        const typeKey = findKey(['type_id', 'loại']);
+        const contentKey = findKey(['content', 'nội dung']);
+        const optAKey = findKey(['option_a', 'đáp án a']);
+        const optBKey = findKey(['option_b', 'đáp án b']);
+        const optCKey = findKey(['option_c', 'đáp án c']);
+        const optDKey = findKey(['option_d', 'đáp án d']);
+        const correctKey = findKey(['correct_option', 'đáp án đúng']);
+        const explKey = findKey(['explanation', 'giải thích']);
+
+        const parseNum = (val: any) => {
+          if (!val) return undefined;
+          const n = Number(val);
+          return isNaN(n) || n === 0 ? undefined : n;
+        };
+
+        // Map số thứ tự chương trong Excel → chapter_id thực tế trong DB của môn đó
+        const parseChapterId = (val: any): number | undefined => {
+          if (!val) return undefined;
+          const orderNum = Number(val);
+          if (isNaN(orderNum) || orderNum === 0) return undefined;
+          const realId = chapterByOrder.get(orderNum);
+          if (!realId) {
+            // Chương không tồn tại trong môn này — trả về -1 để báo lỗi
+            return -1;
+          }
+          return realId;
+        };
+
+        // Map chữ → ID cho độ khó (level)
+        const parseLevelId = (val: any): number | undefined => {
+          if (!val) return undefined;
+          const s = String(val).toLowerCase().trim();
+          if (s === '1' || s === 'dễ' || s === 'de') return 1;
+          if (s === '2' || s === 'trung bình' || s === 'trung binh' || s === 'tb') return 2;
+          if (s === '3' || s === 'khó' || s === 'kho') return 3;
+          const n = Number(val);
+          return isNaN(n) || n === 0 ? undefined : n;
+        };
+
+        // Map chữ → ID cho loại câu hỏi (type)
+        const parseTypeId = (val: any): number | undefined => {
+          if (!val) return undefined;
+          const s = String(val).toLowerCase().trim();
+          if (s === '1' || s === 'lý thuyết' || s === 'ly thuyet' || s === 'lí thuyết') return 1;
+          if (s === '2' || s === 'bài tập' || s === 'bai tap') return 2;
+          const n = Number(val);
+          return isNaN(n) || n === 0 ? undefined : n;
+        };
+
+        const rawChapterId = chapterKey ? parseChapterId(lowerRow[chapterKey]) : undefined;
+
+        // Báo lỗi nếu số chương không tồn tại trong môn
+        if (rawChapterId === -1) {
+          const orderVal = chapterKey ? lowerRow[chapterKey] : '?';
+          errors.push(`Dòng ${i + 2}: Chương số ${orderVal} không tồn tại trong môn này`);
+          continue;
+        }
+
         const data = {
           subject_id,
-          chapter_id: row['chapter_id'] ? Number(row['chapter_id']) : undefined,
-          level_id: row['level_id'] ? Number(row['level_id']) : undefined,
-          type_id: row['type_id'] ? Number(row['type_id']) : undefined,
-          content: row['content'] || '',
-          option_a: row['option_a'] || '',
-          option_b: row['option_b'] || '',
-          option_c: row['option_c'] || '',
-          option_d: row['option_d'] || '',
-          correct_option: row['correct_option'] || '',
-          explanation: row['explanation'] || undefined,
+          chapter_id: rawChapterId,
+          level_id: levelKey ? parseLevelId(lowerRow[levelKey]) : undefined,
+          type_id: typeKey ? parseTypeId(lowerRow[typeKey]) : undefined,
+          content: contentKey ? lowerRow[contentKey] : '',
+          option_a: optAKey ? lowerRow[optAKey] : '',
+          option_b: optBKey ? lowerRow[optBKey] : '',
+          option_c: optCKey ? lowerRow[optCKey] : '',
+          option_d: optDKey ? lowerRow[optDKey] : '',
+          correct_option: correctKey ? lowerRow[correctKey].toUpperCase().trim() : '',
+          explanation: explKey ? lowerRow[explKey] : undefined,
         };
+
         const errs = validateCreateQuestion(data);
         if (errs.length > 0) { errors.push(`Dòng ${i + 2}: ${errs.join(', ')}`); continue; }
         await questionDAO.create(data);
@@ -110,6 +193,28 @@ export class QuestionController {
       }
 
       res.json({ success: true, message: `Nhập thành công ${importedCount} câu hỏi`, errors });
+    } catch (err: unknown) {
+      res.status(500).json({ success: false, message: (err as Error).message });
+    }
+  }
+
+  async downloadTemplate(req: Request, res: Response): Promise<void> {
+    try {
+      const workbook = XLSX.utils.book_new();
+      const sheetData = [
+        ['chapter_id', 'level_id', 'type_id', 'content', 'option_a', 'option_b', 'option_c', 'option_d', 'correct_option', 'explanation'],
+        ['1', '1', '1', 'Câu hỏi mẫu 1', 'Đáp án A', 'Đáp án B', 'Đáp án C', 'Đáp án D', 'A', 'Giải thích mẫu'],
+        ['1', '2', '2', 'Câu hỏi mẫu 2', 'Lựa chọn A', 'Lựa chọn B', 'Lựa chọn C', 'Lựa chọn D', 'B', '']
+      ];
+      const sheet = XLSX.utils.aoa_to_sheet(sheetData);
+      sheet['!cols'] = [ { wch: 12 }, { wch: 10 }, { wch: 15 }, { wch: 40 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 30 } ];
+      
+      XLSX.utils.book_append_sheet(workbook, sheet, 'Template');
+      const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+      
+      res.setHeader('Content-Disposition', 'attachment; filename="Template_NhapCauHoi.xlsx"');
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.send(buffer);
     } catch (err: unknown) {
       res.status(500).json({ success: false, message: (err as Error).message });
     }

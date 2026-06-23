@@ -71,7 +71,7 @@ export class QuestionDAO {
     }
     sql += ' ORDER BY RAND() LIMIT ?';
     params.push(count);
-    
+
     const [rows] = await pool.query<RowDataPacket[]>(sql, params);
     return rows as QuestionRow[];
   }
@@ -101,8 +101,8 @@ export class QuestionDAO {
       `INSERT INTO Questions (subject_id, chapter_id, level_id, type_id, content, option_a, option_b, option_c, option_d, correct_option, explanation)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [data.subject_id, data.chapter_id || null, data.level_id || null, data.type_id || null,
-       data.content, data.option_a, data.option_b, data.option_c, data.option_d,
-       data.correct_option, data.explanation || null]
+      data.content, data.option_a, data.option_b, data.option_c, data.option_d,
+      data.correct_option, data.explanation || null]
     );
     return result.insertId;
   }
@@ -114,13 +114,31 @@ export class QuestionDAO {
   }>): Promise<void> {
     const fields: string[] = [];
     const values: unknown[] = [];
-    const allowed = ['chapter_id','level_id','type_id','content','option_a','option_b','option_c','option_d','correct_option','explanation'];
+    const allowed = ['chapter_id', 'level_id', 'type_id', 'content', 'option_a', 'option_b', 'option_c', 'option_d', 'correct_option', 'explanation'];
     for (const key of allowed) {
-      if (key in data) { fields.push(`${key} = ?`); values.push((data as Record<string,unknown>)[key]); }
+      if (key in data) {
+        let val = (data as Record<string, unknown>)[key];
+        // Cast 0 to null for foreign keys so MySQL doesn't throw constraint fails
+        if (['chapter_id', 'level_id', 'type_id'].includes(key) && (val === 0 || val === '0')) {
+          val = null;
+        }
+        fields.push(`${key} = ?`);
+        values.push(val);
+      }
     }
     if (fields.length === 0) return;
     values.push(question_id);
     await pool.query(`UPDATE Questions SET ${fields.join(', ')} WHERE question_id = ?`, values);
+  }
+
+  async hasPracticeHistory(question_id: number): Promise<boolean> {
+    const [uqsRows] = await pool.query<RowDataPacket[]>(
+      'SELECT COUNT(*) as total FROM User_question_status WHERE question_id = ?', [question_id]
+    );
+    const [saRows] = await pool.query<RowDataPacket[]>(
+      'SELECT COUNT(*) as total FROM Session_answers WHERE question_id = ?', [question_id]
+    );
+    return (uqsRows[0].total > 0) || (saRows[0].total > 0);
   }
 
   async delete(question_id: number): Promise<void> {

@@ -18,6 +18,14 @@ export class ChapterDAO {
         return result.insertId;
     }
 
+    async updateChapter(chapter_id: number, data: { chapter_name: string }): Promise<boolean> {
+        const [result] = await pool.query<ResultSetHeader>(
+            'UPDATE Chapters SET chapter_name = ? WHERE chapter_id = ?',
+            [data.chapter_name, chapter_id]
+        );
+        return result.affectedRows > 0;
+    }
+
     async getDifficultyLevels(): Promise<{ level_id: number; level_name: string }[]> {
         const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM Difficulty_levels');
         return rows as { level_id: number; level_name: string }[];

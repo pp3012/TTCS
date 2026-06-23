@@ -11,5 +11,6 @@ router.get('/:id', (req, res) => subjectController.getById(req, res));
 router.post('/', authenticate, requireAdmin, (req, res) => subjectController.create(req, res));
 router.put('/:id', authenticate, requireAdmin, (req, res) => subjectController.update(req, res));
 router.delete('/:id', authenticate, requireAdmin, (req, res) => subjectController.delete(req, res));
-
+router.post('/:id/chapters', authenticate, requireAdmin, (req, res) => subjectController.addChapter(req, res));
+router.put('/:id/chapters/:chapterId', authenticate, requireAdmin, (req, res) => subjectController.updateChapter(req, res));
 export default router;

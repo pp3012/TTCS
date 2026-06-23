@@ -18,24 +18,6 @@ export class AdminController {
     }
   }
 
-  async createUser(req: AuthRequest, res: Response): Promise<void> {
-    try {
-      const { user_name, email, password, full_name, role } = req.body;
-      if (!user_name || !email || !password) {
-        res.status(400).json({ success: false, message: 'Thiếu thông tin bắt buộc' }); return;
-      }
-      const existing = await userDAO.findByUsernameOrEmail(user_name);
-      if (existing) { res.status(400).json({ success: false, message: 'Tên đăng nhập hoặc email đã tồn tại' }); return; }
-      const existingEmail = await userDAO.findByEmail(email);
-      if (existingEmail) { res.status(400).json({ success: false, message: 'Email đã tồn tại' }); return; }
-      const password_hash = await bcrypt.hash(password, 10);
-      const user_id = await userDAO.create({ user_name, email, password_hash, full_name, role: role || 'student' });
-      const userRow = await userDAO.findById(user_id);
-      res.status(201).json({ success: true, data: UserModel.fromRow(userRow!).toPublicJSON() });
-    } catch (err: unknown) {
-      res.status(500).json({ success: false, message: (err as Error).message });
-    }
-  }
 
   async getUserById(req: AuthRequest, res: Response): Promise<void> {
     try {
@@ -64,6 +46,11 @@ export class AdminController {
       const user_id = Number(req.params.id);
       if (user_id === req.user?.user_id) {
         res.status(400).json({ success: false, message: 'Không thể xóa tài khoản đang đăng nhập' });
+        return;
+      }
+      const hasHistory = await userDAO.hasPracticeHistory(user_id);
+      if (hasHistory) {
+        res.status(400).json({ success: false, message: 'Không thể xóa người dùng này vì đã có lịch sử luyện tập' });
         return;
       }
       await userDAO.delete(user_id);

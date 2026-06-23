@@ -47,6 +47,8 @@ export const subjectApi = {
   create: (data: object) => api.post('/subjects', data),
   update: (id: number, data: object) => api.put(`/subjects/${id}`, data),
   delete: (id: number) => api.delete(`/subjects/${id}`),
+  addChapter: (subject_id: number, chapter_name: string) => api.post(`/subjects/${subject_id}/chapters`, { chapter_name }),
+  updateChapter: (subject_id: number, chapter_id: number, chapter_name: string) => api.put(`/subjects/${subject_id}/chapters/${chapter_id}`, { chapter_name }),
 };
 
 // ─── Questions ───────────────────────────────────────────
@@ -63,6 +65,7 @@ export const questionApi = {
     form.append('subject_id', String(subject_id));
     return api.post('/questions/import/excel', form, { headers: { 'Content-Type': 'multipart/form-data' } });
   },
+  downloadTemplate: () => api.get('/questions/import/template', { responseType: 'blob' }),
 };
 
 // ─── Practice ────────────────────────────────────────────
@@ -84,7 +87,6 @@ export const practiceApi = {
 export const adminApi = {
   getUsers: (params?: object) => api.get('/admin/users', { params }),
   getUserById: (id: number) => api.get(`/admin/users/${id}`),
-  createUser: (data: object) => api.post('/admin/users', data),
   updateUser: (id: number, data: object) => api.put(`/admin/users/${id}`, data),
   deleteUser: (id: number) => api.delete(`/admin/users/${id}`),
   getSubjectStats: () => api.get('/admin/stats/subjects'),

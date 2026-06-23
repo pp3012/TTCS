@@ -8,9 +8,13 @@ export default function Register() {
   const [form, setForm] = useState({ user_name: '', email: '', password: '', confirm: '', full_name: '' });
   const [error, setError] = useState('');
 
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    if (!emailRegex.test(form.email)) { setError('Email không đúng định dạng (vd: ten@example.com)'); return; }
+    if (form.password.length < 6) { setError('Mật khẩu phải có ít nhất 6 ký tự'); return; }
     if (form.password !== form.confirm) { setError('Mật khẩu xác nhận không khớp'); return; }
     try {
       await register({ user_name: form.user_name, email: form.email, password: form.password, full_name: form.full_name });

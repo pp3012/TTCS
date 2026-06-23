@@ -83,7 +83,9 @@ export class SubjectController {
       const orderIndex = chapters.length + 1;
       const chapterName = String(req.body.chapter_name || '').trim() || `Chương ${orderIndex}`;
       await chapterDAO.createChapter({ subject_id, chapter_name: chapterName, order_index: orderIndex });
-      await subjectDAO.update(subject_id, { total_chapter: orderIndex });
+      
+      // Đồng bộ chính xác số chương vào bảng Subjects
+      await subjectDAO.syncTotalChapter(subject_id);
 
       const updated = await subjectDAO.findById(subject_id);
       const updatedChapters = await chapterDAO.getChaptersBySubject(subject_id);
@@ -93,9 +95,37 @@ export class SubjectController {
     }
   }
 
+  async updateChapter(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const subject_id = Number(req.params.id);
+      const chapter_id = Number(req.params.chapterId);
+      const chapterName = String(req.body.chapter_name || '').trim();
+      
+      if (!chapterName) { res.status(400).json({ success: false, message: 'Tên chương không được để trống' }); return; }
+
+      await chapterDAO.updateChapter(chapter_id, { chapter_name: chapterName });
+      
+      const updatedChapters = await chapterDAO.getChaptersBySubject(subject_id);
+      res.json({ success: true, data: { chapters: updatedChapters } });
+    } catch (err: unknown) {
+      res.status(500).json({ success: false, message: (err as Error).message });
+    }
+  }
+
   async delete(req: AuthRequest, res: Response): Promise<void> {
     try {
-      await subjectDAO.delete(Number(req.params.id));
+      const subject_id = Number(req.params.id);
+      const hasHistory = await subjectDAO.hasPracticeHistory(subject_id);
+      if (hasHistory) {
+        res.status(400).json({ success: false, message: 'Không thể xóa môn học này vì đã có lịch sử luyện tập' });
+        return;
+      }
+      const hasQuestions = await subjectDAO.hasQuestions(subject_id);
+      if (hasQuestions) {
+        res.status(400).json({ success: false, message: 'Không thể xóa môn học này vì vẫn còn câu hỏi tồn tại trong môn học' });
+        return;
+      }
+      await subjectDAO.delete(subject_id);
       res.json({ success: true, message: 'Đã xóa môn học' });
     } catch (err: unknown) {
       res.status(500).json({ success: false, message: (err as Error).message });

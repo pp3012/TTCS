@@ -135,9 +135,50 @@ export class SubjectDAO {
     }
   }
 
+  async hasPracticeHistory(subject_id: number): Promise<boolean> {
+    const [psRows] = await pool.query<RowDataPacket[]>(
+      'SELECT COUNT(*) as total FROM Practice_sessions WHERE subject_id = ?', [subject_id]
+    );
+    const [uqsRows] = await pool.query<RowDataPacket[]>(
+      'SELECT COUNT(*) as total FROM User_question_status uqs JOIN Questions q ON uqs.question_id = q.question_id WHERE q.subject_id = ?',
+      [subject_id]
+    );
+    const [saRows] = await pool.query<RowDataPacket[]>(
+      'SELECT COUNT(*) as total FROM Session_answers sa JOIN Questions q ON sa.question_id = q.question_id WHERE q.subject_id = ?',
+      [subject_id]
+    );
+    const [usRows] = await pool.query<RowDataPacket[]>(
+      'SELECT COUNT(*) as total FROM User_stats WHERE subject_id = ?', [subject_id]
+    );
+    return (psRows[0].total > 0) || (uqsRows[0].total > 0) || (saRows[0].total > 0) || (usRows[0].total > 0);
+  }
+
+  async hasQuestions(subject_id: number): Promise<boolean> {
+    const [rows] = await pool.query<RowDataPacket[]>(
+      'SELECT COUNT(*) as total FROM Questions WHERE subject_id = ?', [subject_id]
+    );
+    return rows[0].total > 0;
+  }
+
   //Xoá môn học theo íd
   async delete(subject_id: number): Promise<void> {
     await pool.query('DELETE FROM Subjects WHERE subject_id = ?', [subject_id]);
+  }
+
+  // Đồng bộ tổng số chương
+  async syncTotalChapter(subject_id: number): Promise<void> {
+    await pool.query(
+      'UPDATE Subjects SET total_chapter = (SELECT COUNT(*) FROM Chapters WHERE subject_id = ?) WHERE subject_id = ?',
+      [subject_id, subject_id]
+    );
+  }
+  // Lấy danh sách chương theo môn học (dùng khi import Excel)
+  async findChaptersBySubject(subject_id: number): Promise<{ chapter_id: number; chapter_name: string; order_index: number }[]> {
+    const [rows] = await pool.query<RowDataPacket[]>(
+      'SELECT chapter_id, chapter_name, order_index FROM Chapters WHERE subject_id = ? ORDER BY order_index, chapter_id',
+      [subject_id]
+    );
+    return rows as { chapter_id: number; chapter_name: string; order_index: number }[];
   }
 }
 

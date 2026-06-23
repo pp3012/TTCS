@@ -56,6 +56,19 @@ export class UserDAO {
     await pool.query(`UPDATE Users SET ${fields.join(', ')} WHERE user_id = ?`, values);
   }
 
+  async hasPracticeHistory(user_id: number): Promise<boolean> {
+    const [psRows] = await pool.query<RowDataPacket[]>(
+      'SELECT COUNT(*) as total FROM Practice_sessions WHERE user_id = ?', [user_id]
+    );
+    const [uqsRows] = await pool.query<RowDataPacket[]>(
+      'SELECT COUNT(*) as total FROM User_question_status WHERE user_id = ?', [user_id]
+    );
+    const [usRows] = await pool.query<RowDataPacket[]>(
+      'SELECT COUNT(*) as total FROM User_stats WHERE user_id = ?', [user_id]
+    );
+    return (psRows[0].total > 0) || (uqsRows[0].total > 0) || (usRows[0].total > 0);
+  }
+
   //xoa user theo id
   async delete(user_id: number): Promise<void> {
     await pool.query('DELETE FROM Users WHERE user_id = ?', [user_id]);

@@ -16,12 +16,17 @@ interface WeightedQuestion { question: QuestionRow; weight: number; }
 export class PersonalizedService {
   async createPersonalizedSession(user_id: number, subject_id: number): Promise<{ session_id: number; questions: object[] }> {
     const stats = await userStatsDAO.findByUserAndSubject(user_id, subject_id);
+    if (!stats || (stats.total_sessions || 0) < 3) {
+      throw new Error('Bạn cần hoàn thành ít nhất 3 lượt luyện tập để hệ thống có thể phân tích và tạo đề cá nhân hóa. Vui lòng trải nghiệm chế độ luyện tập tự do trước.');
+    }
     const diffAcc = this.parseJSON(stats?.difficulty_accuracy);
     const chapterAcc = this.parseJSON(stats?.chapter_accuracy);
 
     const diffDist = this.computeDifficultyDistribution(diffAcc);
     const allQuestions = await questionDAO.findBySubjectGrouped(subject_id);
-    if (allQuestions.length === 0) throw new Error('Môn học chưa có câu hỏi');
+    if (allQuestions.length < DEFAULT_QUESTIONS) {
+      throw new Error(`Môn học không đủ câu hỏi trong ngân hàng (yêu cầu tối thiểu ${DEFAULT_QUESTIONS} câu, hiện tại chỉ có ${allQuestions.length} câu)`);
+    }
 
     const qIds = allQuestions.map(q => q.question_id);
     const statusList = await questionDAO.getUserQuestionStatus(user_id, qIds);

@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { adminApi } from '../../services/api';
 import { User } from '../../types';
 
-const EMPTY_ADD = { user_name: '', email: '', password: '', full_name: '', role: 'student' };
 
 export default function AdminUsers() {
   const [users, setUsers] = useState<User[]>([]);
@@ -15,10 +14,6 @@ export default function AdminUsers() {
   const [editUser, setEditUser] = useState<User | null>(null);
   const [editForm, setEditForm] = useState({ email: '', full_name: '' });
 
-  // Add modal
-  const [showAdd, setShowAdd] = useState(false);
-  const [addForm, setAddForm] = useState(EMPTY_ADD);
-  const [addError, setAddError] = useState('');
   const [saving, setSaving] = useState(false);
 
   const LIMIT = 15;
@@ -61,23 +56,6 @@ export default function AdminUsers() {
     }
   };
 
-  const saveAdd = async () => {
-    if (!addForm.user_name.trim() || !addForm.email.trim() || !addForm.password.trim()) {
-      setAddError('Vui lòng điền đầy đủ các trường bắt buộc (*).'); return;
-    }
-    setSaving(true);
-    setAddError('');
-    try {
-      await (adminApi as any).createUser(addForm);
-      setShowAdd(false);
-      setAddForm(EMPTY_ADD);
-      load();
-    } catch (err: any) {
-      setAddError(err?.response?.data?.message || 'Không thể tạo người dùng');
-    } finally {
-      setSaving(false);
-    }
-  };
 
   const totalPages = Math.ceil(total / LIMIT);
 
@@ -88,9 +66,6 @@ export default function AdminUsers() {
           <h1 className="page-title">Quản lý người dùng</h1>
           <span className="text-muted">{total} tài khoản trong hệ thống</span>
         </div>
-        <button className="btn btn-primary" onClick={() => { setShowAdd(true); setAddForm(EMPTY_ADD); setAddError(''); }}>
-          ＋ Thêm người dùng
-        </button>
       </div>
 
       <div className="filter-bar" style={{ marginBottom: 20 }}>
@@ -107,7 +82,7 @@ export default function AdminUsers() {
           <table className="admin-table">
             <thead>
               <tr>
-                <th>ID</th>
+                <th style={{ width: 60, textAlign: 'center' }}>STT</th>
                 <th>Tên đăng nhập</th>
                 <th>Email</th>
                 <th>Họ tên</th>
@@ -119,9 +94,9 @@ export default function AdminUsers() {
             <tbody>
               {users.length === 0 ? (
                 <tr><td colSpan={7} style={{ textAlign: 'center', color: 'var(--gray-400)', padding: 32 }}>Không tìm thấy người dùng</td></tr>
-              ) : users.map(u => (
+              ) : users.map((u, idx) => (
                 <tr key={u.user_id}>
-                  <td style={{ color: 'var(--gray-400)', fontSize: 12 }}>#{u.user_id}</td>
+                  <td style={{ textAlign: 'center', color: 'var(--gray-500)', fontSize: 12 }}>{(page - 1) * LIMIT + idx + 1}</td>
                   <td style={{ fontWeight: 600 }}>{u.user_name}</td>
                   <td>{u.email}</td>
                   <td>{u.full_name || '—'}</td>
@@ -173,46 +148,6 @@ export default function AdminUsers() {
         </div>
       )}
 
-      {/* ── Add modal ── */}
-      {showAdd && (
-        <div className="modal-overlay" onClick={() => setShowAdd(false)}>
-          <div className="modal" style={{ maxWidth: 560 }} onClick={e => e.stopPropagation()}>
-            <h2 className="modal-title"> Thêm người dùng mới</h2>
-            {addError && <div className="auth-error" style={{ marginBottom: 16 }}>{addError}</div>}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <div className="form-group" style={{ marginBottom: 0 }}>
-                <label className="form-label">Tên đăng nhập <span style={{ color: 'var(--danger)' }}>*</span></label>
-                <input className="form-control" value={addForm.user_name} onChange={e => setAddForm(f => ({ ...f, user_name: e.target.value }))} placeholder="username" />
-              </div>
-              <div className="form-group" style={{ marginBottom: 0 }}>
-                <label className="form-label">Họ và tên</label>
-                <input className="form-control" value={addForm.full_name} onChange={e => setAddForm(f => ({ ...f, full_name: e.target.value }))} placeholder="Nguyễn Văn A" />
-              </div>
-            </div>
-            <div className="form-group" style={{ marginTop: 14 }}>
-              <label className="form-label">Email <span style={{ color: 'var(--danger)' }}>*</span></label>
-              <input className="form-control" type="email" value={addForm.email} onChange={e => setAddForm(f => ({ ...f, email: e.target.value }))} placeholder="example@email.com" />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Mật khẩu <span style={{ color: 'var(--danger)' }}>*</span></label>
-              <input className="form-control" type="password" value={addForm.password} onChange={e => setAddForm(f => ({ ...f, password: e.target.value }))} placeholder="Tối thiểu 6 ký tự" />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Vai trò</label>
-              <select className="form-control" value={addForm.role} onChange={e => setAddForm(f => ({ ...f, role: e.target.value }))}>
-                <option value="student"> Sinh viên</option>
-                <option value="admin"> Admin</option>
-              </select>
-            </div>
-            <div className="modal-actions">
-              <button className="btn btn-secondary" onClick={() => setShowAdd(false)}>Huỷ</button>
-              <button className="btn btn-primary" onClick={saveAdd} disabled={saving}>
-                {saving ? ' Đang tạo...' : ' Thêm người dùng'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
