@@ -68,20 +68,6 @@ export default function AdminQuestions() {
     }
   };
 
-  const handleDownloadTemplate = async () => {
-    try {
-      const res = await questionApi.downloadTemplate();
-      const url = window.URL.createObjectURL(new Blob([res.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'Template_NhapCauHoi.xlsx');
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (e) {
-      alert('Có lỗi khi tải template');
-    }
-  };
 
   const handleImport = async () => {
     const file = fileRef.current?.files?.[0];
@@ -253,41 +239,36 @@ export default function AdminQuestions() {
             <div style={{ marginBottom: 16, fontSize: 13 }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', lineHeight: 1.6 }}>
                 <thead>
-                  <tr style={{ background: 'var(--gray-100, #f3f4f6)', textAlign: 'left' }}>
-                    <th style={{ padding: '6px 10px', border: '1px solid var(--gray-200, #e5e7eb)' }}>Tên cột trong file</th>
-                    <th style={{ padding: '6px 10px', border: '1px solid var(--gray-200, #e5e7eb)' }}>Ý nghĩa</th>
-                    <th style={{ padding: '6px 10px', border: '1px solid var(--gray-200, #e5e7eb)' }}>Bắt buộc</th>
-                    <th style={{ padding: '6px 10px', border: '1px solid var(--gray-200, #e5e7eb)' }}>Giá trị hợp lệ</th>
-                  </tr>
+                <tr style={{ background: 'var(--gray-100, #f3f4f6)', textAlign: 'left' }}>
+                  <th style={{ padding: '6px 10px', border: '1px solid var(--gray-200, #e5e7eb)' }}>Cột</th>
+                  <th style={{ padding: '6px 10px', border: '1px solid var(--gray-200, #e5e7eb)' }}>Bắt buộc</th>
+                  <th style={{ padding: '6px 10px', border: '1px solid var(--gray-200, #e5e7eb)' }}>Giá trị hợp lệ</th>
+                </tr>
                 </thead>
                 <tbody>
-                  {[
-                    { col: 'content',        label: 'Nội dung câu hỏi', req: true,  note: 'Câu hỏi đầy đủ' },
-                    { col: 'option_a',       label: 'Đáp án A',         req: true,  note: 'Nội dung đáp án A' },
-                    { col: 'option_b',       label: 'Đáp án B',         req: true,  note: 'Nội dung đáp án B' },
-                    { col: 'option_c',       label: 'Đáp án C',         req: true,  note: 'Nội dung đáp án C' },
-                    { col: 'option_d',       label: 'Đáp án D',         req: true,  note: 'Nội dung đáp án D' },
-                    { col: 'correct_option', label: 'Đáp án đúng',      req: true,  note: 'A  hoặc  B  hoặc  C  hoặc  D' },
-                    { col: 'chapter_id',     label: 'Chương',           req: false, note: 'Số thứ tự chương của môn được chọn (1, 2, 3...)' },
-                    { col: 'level_id',       label: 'Độ khó',           req: false, note: 'dễ  |  trung bình  |  khó  (hoặc 1 / 2 / 3)' },
-                    { col: 'type_id',        label: 'Loại câu hỏi',     req: false, note: 'lý thuyết  |  bài tập  (hoặc 1 / 2)' },
-                    { col: 'explanation',    label: 'Giải thích',        req: false, note: 'Giải thích đáp án (có thể bỏ trống)' },
-                  ].map(({ col, label, req, note }) => (
-                    <tr key={col}>
-                      <td style={{ padding: '5px 10px', border: '1px solid var(--gray-200, #e5e7eb)', fontFamily: 'monospace', fontWeight: 600, whiteSpace: 'nowrap' }}>{col}</td>
+                {[
+                  { label: 'Nội dung câu hỏi', req: true,  note: 'Nội dung câu hỏi đầy đủ' },
+                  { label: 'Đáp án A',         req: true,  note: 'Nội dung đáp án A' },
+                  { label: 'Đáp án B',         req: true,  note: 'Nội dung đáp án B' },
+                  { label: 'Đáp án C',         req: true,  note: 'Nội dung đáp án C' },
+                  { label: 'Đáp án D',         req: true,  note: 'Nội dung đáp án D' },
+                  { label: 'Đáp án đúng',      req: true,  note: 'A  hoặc  B  hoặc  C  hoặc  D' },
+                  { label: 'Chương',           req: false, note: 'Số thứ tự chương của môn được chọn (1, 2, 3...)' },
+                  { label: 'Độ khó',           req: false, note: 'dễ  |  trung bình  |  khó  ' },
+                  { label: 'Loại câu hỏi',     req: false, note: 'lý thuyết  |  bài tập  ' },
+                  { label: 'Giải thích',        req: false, note: 'Giải thích đáp án (nếu có)' },
+                ].map(({ label, req, note }) => (
+                    <tr key={label}>
                       <td style={{ padding: '5px 10px', border: '1px solid var(--gray-200, #e5e7eb)' }}>{label}</td>
                       <td style={{ padding: '5px 10px', border: '1px solid var(--gray-200, #e5e7eb)', textAlign: 'center' }}>
                         {req ? <span style={{ color: 'var(--danger, #ef4444)', fontWeight: 700 }}>✓ Có</span>
-                              : <span style={{ color: 'var(--gray-400, #9ca3af)' }}>Không</span>}
+                            : <span style={{ color: 'var(--gray-400, #9ca3af)' }}>Không</span>}
                       </td>
                       <td style={{ padding: '5px 10px', border: '1px solid var(--gray-200, #e5e7eb)', color: 'var(--gray-600, #4b5563)' }}>{note}</td>
                     </tr>
-                  ))}
+                ))}
                 </tbody>
               </table>
-              <p style={{ marginTop: 8, color: 'var(--gray-400, #9ca3af)' }}>
-                ℹ️ Thứ tự cột không quan trọng. Cột lạ hoặc không có trong danh sách trên sẽ bị bỏ qua.
-              </p>
             </div>
             <div className="form-group">
               <label className="form-label">Môn học</label>
@@ -296,10 +277,7 @@ export default function AdminQuestions() {
               </select>
             </div>
             <div className="form-group">
-              <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>Chọn file</span>
-                <a href="#" onClick={(e) => { e.preventDefault(); handleDownloadTemplate(); }} style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600 }}>Tải file mẫu Excel</a>
-              </label>
+              <label className="form-label">Chọn file</label>
               <input type="file" ref={fileRef} accept=".xlsx,.xls" className="form-control" />
             </div>
             {importMsg && (

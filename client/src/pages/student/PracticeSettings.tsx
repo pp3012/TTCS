@@ -156,7 +156,7 @@ export default function PracticeSettings() {
               </div>
               <div className="summary-item">
                 <div className="summary-key">Thời gian</div>
-                <div className="summary-val">⏱ 60:00</div>
+                <div className="summary-val">60:00</div>
               </div>
             </div>
             <button className="btn btn-full btn-lg" style={{ background: 'var(--secondary)', color: '#fff' }} onClick={startPersonalized} disabled={loading}>

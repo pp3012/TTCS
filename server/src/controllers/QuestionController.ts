@@ -198,27 +198,6 @@ export class QuestionController {
     }
   }
 
-  async downloadTemplate(req: Request, res: Response): Promise<void> {
-    try {
-      const workbook = XLSX.utils.book_new();
-      const sheetData = [
-        ['chapter_id', 'level_id', 'type_id', 'content', 'option_a', 'option_b', 'option_c', 'option_d', 'correct_option', 'explanation'],
-        ['1', '1', '1', 'Câu hỏi mẫu 1', 'Đáp án A', 'Đáp án B', 'Đáp án C', 'Đáp án D', 'A', 'Giải thích mẫu'],
-        ['1', '2', '2', 'Câu hỏi mẫu 2', 'Lựa chọn A', 'Lựa chọn B', 'Lựa chọn C', 'Lựa chọn D', 'B', '']
-      ];
-      const sheet = XLSX.utils.aoa_to_sheet(sheetData);
-      sheet['!cols'] = [ { wch: 12 }, { wch: 10 }, { wch: 15 }, { wch: 40 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 30 } ];
-      
-      XLSX.utils.book_append_sheet(workbook, sheet, 'Template');
-      const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
-      
-      res.setHeader('Content-Disposition', 'attachment; filename="Template_NhapCauHoi.xlsx"');
-      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-      res.send(buffer);
-    } catch (err: unknown) {
-      res.status(500).json({ success: false, message: (err as Error).message });
-    }
-  }
 }
 
 export const questionController = new QuestionController();

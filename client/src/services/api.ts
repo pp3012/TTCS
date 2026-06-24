@@ -65,7 +65,6 @@ export const questionApi = {
     form.append('subject_id', String(subject_id));
     return api.post('/questions/import/excel', form, { headers: { 'Content-Type': 'multipart/form-data' } });
   },
-  downloadTemplate: () => api.get('/questions/import/template', { responseType: 'blob' }),
 };
 
 // ─── Practice ────────────────────────────────────────────

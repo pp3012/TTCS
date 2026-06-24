@@ -29,7 +29,7 @@ app.get('/api/health', (_, res) => res.json({ status: 'ok', time: new Date() }))
 app.use(errorHandler);
 
 app.listen(PORT, () => {
-  console.log(`✅ EduQuiz Server running on http://localhost:${PORT}`);
+  console.log(`EduQuiz Server running on http://localhost:${PORT}`);
 });
 
 export default app;

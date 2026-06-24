@@ -7,7 +7,6 @@ client/dist/
 # IDE configuration (JetBrains)
 .idea/
 *.iml
-
 # Data source configurations (may contain DB credentials)
 .dataSources.xml
 dataSources.xml
