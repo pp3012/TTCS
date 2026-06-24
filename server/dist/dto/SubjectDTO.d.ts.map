@@ -1,1 +1,0 @@
-{"version":3,"file":"SubjectDTO.d.ts","sourceRoot":"","sources":["../../src/dto/SubjectDTO.ts"],"names":[],"mappings":"AAAA,MAAM,WAAW,gBAAgB;IAC7B,YAAY,EAAE,MAAM,CAAC;IACrB,aAAa,CAAC,EAAE,MAAM,CAAC;IACvB,WAAW,CAAC,EAAE,MAAM,CAAC;CACxB;AAED,wBAAgB,qBAAqB,CAAC,IAAI,EAAE,OAAO,CAAC,gBAAgB,CAAC,GAAG,MAAM,EAAE,CAO/E"}
