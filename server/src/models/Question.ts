@@ -1,4 +1,4 @@
-// Model layer: Question DTO - che giấu correct_option khi trả về cho student
+// Định nghĩa cấu trúc dữ liệu thô 1 row/record nhận về từ Database
 export interface QuestionRow {
   question_id: number;
   subject_id: number;

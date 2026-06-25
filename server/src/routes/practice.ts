@@ -1,17 +1,20 @@
 import { Router } from 'express';
 import { practiceController } from '../controllers/User/PracticeController';
 import { authenticate } from '../middleware/authMiddleware';
-import { statisticsService } from '../services/StatisticsService';
+import { statsController } from '../controllers/StatsController';
 
 const router = Router();
+router.use(authenticate);
 
-router.post('/free', authenticate, (req, res) => practiceController.createFreeSession(req, res));
-router.post('/personalized', authenticate, (req, res) => practiceController.createPersonalizedSession(req, res));
-router.get('/:sessionId/questions', authenticate, (req, res) => practiceController.getQuestions(req, res));
-router.post('/:sessionId/submit', authenticate, (req, res) => practiceController.submitSession(req, res));
-router.get('/:sessionId/result', authenticate, (req, res) => practiceController.getResult(req, res));
-router.get('/history/me', authenticate, (req, res) => practiceController.getHistory(req, res));
-router.get('/stats/me', authenticate, async (req, res) => {
+router.post('/free', (req, res) => practiceController.createFreeSession(req, res));
+router.post('/personalized', (req, res) => practiceController.createPersonalizedSession(req, res));
+router.get('/:sessionId/questions', (req, res) => practiceController.getQuestions(req, res));
+router.post('/:sessionId/submit', (req, res) => practiceController.submitSession(req, res));
+router.get('/:sessionId/result', (req, res) => practiceController.getResult(req, res));
+router.get('/history/me', (req, res) => practiceController.getHistory(req, res));
+router.get('/stats/me', (req, res) => statsController.getUserStats(req, res));
+/*
+router.get('/stats/me', async (req, res) => {
   try {
     const user_id = ((req as any) as { user?: { user_id: number } }).user?.user_id;
     const { subject_id } = req.query;
@@ -27,5 +30,5 @@ router.get('/stats/me', authenticate, async (req, res) => {
     res.status(500).json({ success: false, message: (err as Error).message });
   }
 });
-
+*/
 export default router;

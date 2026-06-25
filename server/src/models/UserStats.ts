@@ -33,6 +33,7 @@ export class UserStatsModel {
     this.subject_name = row.subject_name;
   }
 
+  // Hàm nội bộ để phân tích cú pháp chuỗi JSON một cách an toàn
   private static parseJSON(val: string | Record<string, number> | null): Record<string, number> {
     if (!val) return {};
     if (typeof val === 'object') return val;

@@ -1,4 +1,4 @@
-// Định nghĩa cấu trúc dữ liệu thô nhận về từ Database
+// Định nghĩa cấu trúc dữ liệu thô 1 row/record nhận về từ Database
 export interface SubjectRow {
   subject_id: number;
   subject_name: string;
@@ -12,6 +12,7 @@ export class SubjectModel {
   private total_chapter: number;
   private description: string | null;
 
+  //private Constructor
   private constructor(row: SubjectRow) {
     this.subject_id = row.subject_id;
     this.subject_name = row.subject_name;

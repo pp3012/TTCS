@@ -63,6 +63,7 @@ export class PracticeSessionModel {
     };
   }
 }
+
 export interface SessionAnswerRow {
   session_id: number;
   question_id: number;

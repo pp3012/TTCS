@@ -1,4 +1,4 @@
-
+//Interface định nghĩa cấu trúc 1 record/row trả 1 truy vấn sql lấy từ db
 export interface UserRow {
   user_id: number;
   user_name: string;
@@ -17,6 +17,8 @@ export class UserModel {
   private role: string;
   private created_at: Date;
 
+  // private Constructor -> ko cho bên ngoài dùng new UserModel(...)` trực tiếp,
+  // bắt buộc phải khởi tạo đối tượng thông qua hàm static `fromRow` ở bên dưới.
   private constructor(row: UserRow) {
     this.user_id = row.user_id;
     this.user_name = row.user_name;
@@ -26,6 +28,7 @@ export class UserModel {
     this.created_at = row.created_at;
   }
 
+  //Nhận 1 object kiểu `UserRow` (kết quả từ DB) và trả về 1 entity `UserModel`
   static fromRow(row: UserRow): UserModel {
     return new UserModel(row);
   }
@@ -37,6 +40,7 @@ export class UserModel {
   getRole(): string { return this.role; }
   getCreatedAt(): Date { return this.created_at; }
 
+  //chuyển đổi UserModel -> object JSON để gửi về cho Client (Frontend).
   toPublicJSON() {
     return {
       user_id: this.user_id,
