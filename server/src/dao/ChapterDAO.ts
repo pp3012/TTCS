@@ -3,12 +3,23 @@ import { ChapterRow } from '../models/Chapter';
 import { RowDataPacket, ResultSetHeader } from 'mysql2/promise';
 
 export class ChapterDAO {
+    // Định nghĩa một hàm bất đồng bộ tên là 'getChaptersBySubject'.
+    // Tham số đầu vào là 'subject_id', kiểu số (number).
+    // Hàm này trả về một 'Promise', chứa một mảng dạng 'ChapterRow[]'.
     async getChaptersBySubject(subject_id: number): Promise<ChapterRow[]> {
         const [rows] = await pool.query<RowDataPacket[]>(
+            //'<RowDataPacket[]>' là định kiểu của thư viện mysql2, rằng dữ liệu thô trả về từ DB sẽ là một mảng các gói dữ liệu hàng.
             'SELECT * FROM Chapters WHERE subject_id = ? ORDER BY order_index', [subject_id]
         );
         return rows as ChapterRow[];
     }
+    // result[0] -> Mảng các record (Dữ liệu thực tế)
+    // [{ id: 1, title: 'Chương 1', subject_id: 10 },
+    //   { id: 2, title: 'Chương 2', subject_id: 10 }]
+    // result[1] -> Mảng metadata (Thông tin cột)
+    // [FieldPacket { name: 'id', columnLength: 11, type: 3, ... },
+    //  FieldPacket { name: 'title', columnLength: 255, type: 253, ... },
+    //  FieldPacket { name: 'subject_id', columnLength: 11, type: 3, ... }]
 
     async createChapter(data: { subject_id: number; chapter_name: string; order_index?: number }): Promise<number> {
         const [result] = await pool.query<ResultSetHeader>(
